@@ -1,0 +1,38 @@
+Group: Mixed Effects
+
+1. Can you explain the concepts of posterior mean/density?
+
+Answer: Do not focus on the Baysian perspective!
+
+2. I have seen parametric bootstrap method appearing many times in Faraway 
+book to estimate random effects, what's the diifference between this method 
+and monto carlo simulation? do you suggest us to apply it in our paper?
+
+Answer: The only difference between the parametric bootstrap and a Monte-Carlo simulation is that the parametric bootstrap uses *estimated* parameters, while a Monte-Carlo simulation uses the true  parameters.
+
+
+3. We are basically thinking about an immigration model based in Germany 
+which explores the relationship between the income of immigrant and factors 
+that could affect it. we treat IQ, gender, the country where he/she comes 
+from etc as fixed effects, his/her education level in germany and his/her 
+father's social class(can be changing through time).etc as random effects, 
+is this model applicable? what should we notice when constructing a brief 
+and convincing model?
+
+
+
+Aim of your project: 
+
+1. Describe the Linear Mixed-Effects Model
+2. Describe the estimation techniques (REML)
+3. Describe the problems when making inference and the most common inferencial approaches.
+(3.1 ?? Kenward Roger (degrees of freedoms approximation))
+(3.2 ?? Parametric Bootstrap)
+4. Simulation (?)
+5. Application
+
+
+Additional texbook: 
+Regression Models Methods and Applications (see, e.g., Ch 7.3 on inference)
+
+http://www.uni-goettingen.de/de/550514.html

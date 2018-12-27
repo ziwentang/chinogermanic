@@ -1,0 +1,45 @@
+
+
+- Do we have to account for fixed and random “factors”
+
+Better: Do we have to account for deterministic and stochastic X-variables? 
+
+ANSWER: Yes, as in the usual why for regression models. 
+
+Something like this: "If the X-variables are stochastic, our assumptions on the error term \epsilon_{ij} have to be understood as conditional on X_i."
+
+
+- Should we focus on nested / clustered random effects for example or can we stay general?
+
+ANSWER: This depends on the focus you want to choose. You do not have to go deep into nested design, but you can if you want and you should if you want to use a nested design in the real data application.
+
+
+-Use an example to illustrate? Do you care? Can we take an example that another paper already used? Does it have to be economic?
+
+ANSWER: Illustrations by examples are very welcome (usually simple and instructive examples)! I do not care whether they are from an economic context or not. You can, of course, use examples from papers and textbooks. 
+
+
+- How important are fixed effects? Random effects seem to be more attractive → existing literature
+
+ANSWER: Only FE-Model == Usual Regression model. You do not have to describe the usual Regression model. But describe when to use which: RE or FE? Discuss also the pros/and cons of RE and FE components.
+
+
+
+- Should we understand algorithm in each step completely? what if we use equations directly
+
+ANSWER: It depends. ;) 
+
+
+- When to use marginal model? when conditional model? 
+
+ANSWER: The "marginal model" and the "conditional model" are only two *PERSPECTIVES* on the same linear mixed effects model in Eq. (7.2) on p. 351 (Fahrmeier)
+
+
+- conditional and marginal model? Useful? Should be considered?  Page 352 in Methods and applications 2013 Fahrmeir 
+
+ANSWER: Yes, this belongs to "describing the linear mixed effects models".
+
+
+- Can you explain Figure 7.2, page 354  in Methods and applications 2013 Fahrmeir 
+
+ANSWER: Explanations in the meeting.
