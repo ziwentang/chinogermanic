@@ -1,0 +1,109 @@
+\documentclass[a4paper,11pt]{article} 
+% Load some standard packages
+\usepackage{amsmath,parskip,fullpage,natbib} 
+
+% Load tikz for the tree diagram
+\usepackage{tikz}
+\usetikzlibrary{trees,shapes}
+
+% Define my own commands
+\newcommand{\info}{{\cal I}}
+\newcommand{\E}{\text{E}}
+
+% Bibliography style
+\bibliographystyle{agsm}
+
+\begin{document}  
+\title{REML part}
+\author{Ziwen Tang}
+\maketitle
+
+\section{REML does it-show}
+
+In simple problems where solutions to variance components are closed-form (like linear regression above), we can remove the bias post hoc by multiplying a correction factor. However, for complex problems where closed-form solutions do not exist, we need to resort to a more general method to obtain a bias-free estimation for variance components.This is known as restricted or residual maximum likelihood, or REML. Generally, estimation bias in variance components originates from the DoF loss in estimating mean components. If we estimated variance components with true mean component values, the estimation would be unbiased. 
+
+The intuition behind ReML is to maximize a modified likelihood that is free of mean components instead of the original likelihood as in ML.It means we first remove the effect of the fixed variables: remember that the residuals are uncorrelated with all the fixed variables in the model. The distribution of the residuals is also normal, because computing residuals from y just involves taking weighted sums. But the distribution of the residuals no longer depends on the estimates of the fixed effects, it only depends on the variance components.
+
+Consider a general linear regression model:
+\begin{equation}\label{eq:0} 
+         y= X\beta + \epsilon
+\end{equation}
+where $y$ is still an N-vector of responses, $X$ is still an $N*k$ design matrix, but residual $\epsilon$ is no longer assumed to distribute as $\mathcal{N}(0,\epsilon^2I_N)$, but rather $\mathcal{N} (0, H(\theta))$, where $H(\theta)$ is a general covariance matrix parametrized by $\theta$. For simplicity, $H(\theta)$ is often written as just $H$. Previously, we have been referring to $\theta$ as “variance components.”
+
+If vector $a$ is orthogonal to all columns of X, i.e., $a^T X = 0 $, then $a^T y$ is known as an error contrast. We can find at most $N-k$ such vectors that are linearly independent\footnote{ Imagine a plane spanned by $k = 2$ linearly independent vectors in three-dimensional space $(N = 3)$. We can find at most $N - k = 1$ vector (passing the origin) orthogonal to the plane.}. Define $A =\begin{bmatrix} a_1 a_2 ... a_(N-k) \end{bmatrix}$. It follows that $A^T X = 0$ and $E{A^T y} = 0$. $S = I_N - X(X^T X)^{-1} X^T $ is a candidate for A, as $SX = 0$. Furthermore, it can be shown $A A^T = S$ and $A^T A = I_N$AT A = IN.
+
+The error contrast vector 
+\begin{equation}\label{eq1} 
+         w = A^T y = A^T（X \beta + \epsilon）= A^T \epsilon \sim \mathcal{N}(0,A^T H A)
+\end{equation}
+ is free of $\beta$. [Patterson and Thompson, 1971] has proven that in the absence of information on $\beta$, no information about $\theta$ is lost when inference is based on $w$ rather than on y. We can now directly estimate $\theta$ by maximizing a “restricted” log-likelihood function $ {\mathcal{L}}_w (\theta| A^T y)$. This bypasses estimating $\beta$ first and can Therefore, produce unbiased estimates for $\theta$.
+
+Once $H(\theta)$ is known, the generalized least squares (GLS) solution to $\beta$ minimizing squared Mahalanobis length of the residual $(Y - X\beta)^T H^-1(Y - X\beta)$ is just
+\begin{equation}\label{eq:mean} 
+         \widehat{\beta} = (X^T H^{-1} X)^{-1} X^T H^{-1} y
+\end{equation}
+
+We now derive a convenient expression for ${\mathcal{L}}_w(\theta| A^T y)$ [Harville, 1974].
+\begin{equation}\label{eq:2} 
+  \begin{split}
+         {\mathcal{L}}_w (\theta| A^T y) &= log f_w (A^T y | \theta) \\
+                                        &= log f_w (A^T y | \theta) \int f_{\widehat{\beta}}(\widehat{\beta} | \beta , \theta) d\widehat{\beta} \\
+                                        &= log f_w (A^T y | \theta) \int f_{\widehat{\beta}}(G^T y | \beta , \theta) d\beta \quad  (\widehat{\beta},\beta\; exchangeable\; here)\\
+                                        &= log \int f_w(A^T y | \theta)f_{\widehat{\beta}}(G^T y | \beta , \theta) d\beta \\
+                                        &= log \int f_{w,\widehat{\beta}}(A^T y, G^T y | \beta , \theta) d\beta \\
+                                        &= log \int f_y \bigg(\bigg[A\quad G\bigg]^T y |\beta,\theta\bigg)d\beta \\
+                                        &= log \frac{1}{|det\bigg[A\quad G\bigg]|} \int f_y (y|\beta,\theta)d\beta
+  \end{split}
+\end{equation}
+From appendix 1,we continue deriving
+\begin{equation}\label{eq:2} 
+  \begin{split}
+         {\mathcal{L}}_w (\theta| A^T y) &= log \frac{1}{|det\bigg[A\quad G\bigg]|} \int f_y (y|\beta,\theta)d\beta \\
+                                        &= log (det X^T X)^\frac{1}{2} \int f_y (y|\beta,\theta)d\beta \\
+                                        &= log (det X^T X)^\frac{1}{2} \int \frac{1}{\sqrt{(2\pi)^N det H}} exp \bigg(-\frac{1}{2}(y - X\beta)^T H^{-1} (y - X\beta)\bigg)d\beta\\
+                                        &= log (det X^T X)^\frac{1}{2} (2\pi)^{-\frac{N}{2}}(det H)^{-\frac{1}{2}} \int exp \bigg(-\frac{1}{2}(y - X\beta)^T H^{-1} (y - X\beta)\bigg)d\beta
+  \end{split}
+\end{equation}
+we can decompose $(y - X\beta)^T H^{-1} (y - X\beta)$ into $(y - X\widehat{\beta})^T H^{-1} (y - X\widehat{\beta}) + (\beta - \widehat{\beta} )^T(X^T H^{-1} X)(\beta - \widehat{\beta})$ with equation \eqref{eq:mean}
+so we resume
+\begin{equation}\label{eq:3} 
+  \begin{split}
+ {\mathcal{L}}_w (\theta| A^T y) &= log (det X^T X)^\frac{1}{2} (2\pi)^{-\frac{N}{2}}(det H)^{-\frac{1}{2}} \int exp (-\frac{1}{2}(y - X\beta)^T H^{-1} (y - X\beta))d\beta\\
+                                        &= log (det X^T X)^\frac{1}{2} (2\pi)^{-\frac{N}{2}}(det H)^{-\frac{1}{2}} exp (-\frac{1}{2}(y - X\widehat{\beta})^T H^{-1} (y - X\widehat{\beta})) \\ &\int exp(-\frac{1}{2}(\beta - \widehat{\beta} )^T(X^T H^{-1} X)(\beta - \widehat{\beta}))d\beta \\
+                                        &= log (det X^T X)^\frac{1}{2} (2\pi)^{-\frac{N}{2}}(det H)^{-\frac{1}{2}} exp (-\frac{1}{2}(y - X\widehat{\beta})^T H^{-1} (y - X\widehat{\beta})) \\ &(2\pi)^{\frac{k}{2}} (det X^T H^{-1} X)^{-\frac{1}{2}} (a \;Gaussian \;integral) \\
+                                        &= log(2\pi)^{-\frac{1}{2}(N-k)}(det X^T X)^{\frac{1}{2}}(det H)^{-\frac{1}{2}} (det X^T H^{-1} X)^{-\frac{1}{2}} \\ &exp (-\frac{1}{2}(y - X\widehat{\beta})^T H^{-1} (y - X\widehat{\beta})) \\
+                                        &= -\frac{1}{2}(N-k) log(2\pi) + \frac{1}{2} log det X^T X - \frac{1}{2} log det H \\ &-\frac{1}{2} log det X^T H^{-1} X  -\frac{1}{2}(y - X\widehat{\beta})^T H^{-1} (y - X\widehat{\beta}))
+  \end{split}
+\end{equation}
+where 
+\begin{equation}\label{eq:4} 
+         \widehat{\beta} = (X^T H^{-1} X)^{-1} X^T H^{-1} y
+\end{equation}
+With this convenient expression, we can maximize the restricted log-likelihood$ {\mathcal{L}}_w (\theta| A^T y)$ w.r.t. variance components $\theta$ to obtain an unbiased estimate for the covariance matrix $H(\widehat{\theta})$ and the corresponding regression coefficient estimates  $\widehat{\beta}$. Newton-Raphson method is usually employed. For more computational details, see [Lindstrom
+and Bates, 1988].
+
+We have seen the estimation bias in θ by ML. In the simplest form of linear regression where we assume $H = \sigma ^ 2 I_N$ , estimation $\widehat{\sigma} ^ 2$ is closed-form, allowing us to correct the bias simply with a multiplicative factor. Next we verify that, in the simplest form of linear regression, the ReML method produces exactly the same solutions as ML method followed by the post hoc correction.
+Set
+\begin{equation}\label{eq:5} 
+  \begin{split}
+          \frac{d}{d \sigma ^2} {\mathcal{L}}_w (\theta| A^T y) &= \frac{d}{d \sigma ^2} -\frac{1}{2} log det H-\frac{1}{2} log det X^T H^{-1} X -\frac{1}{2}(y - X\widehat{\beta})^T H^{-1} (y - X\widehat{\beta})\\
+          &= \frac{d}{d \sigma ^2} -\frac{1}{2}(N-k) log \sigma ^2 -\frac{1}{2 \sigma ^2}(y - X\widehat{\beta})^T (y - X\widehat{\beta})\\
+          &= 0
+  \end{split}
+\end{equation}
+We obtain exactly the same result as Equation, produced by post hoc correction.It is worth noticing that in this simplest linear regression case, the mean estimate $\widehat{\beta}$ is independent of the variance component  $\theta$(Equation). This implies although the ML and ReML estimates of $\widehat{\sigma} ^ 2$ are different, the estimates of  $\widehat{\beta}$ are the same. This is no longer true for more complex regression models, such as the linear mixed-effects model, as to be seen in the next section. Thus, for those complex models, we have a ReML estimate of $\theta$and also a “ReML” estimate of $\beta$, both being different from their ML estimates.
+
+appendix 1
+we express $|det\bigg[A\quad G\bigg]|$ in terms of $X$.
+\begin{equation}\label{eq:6} 
+  \begin{split}
+           |det\bigg[A\quad G\bigg]| &= \bigg(det \bigg[A\quad G\bigg]^T \bigg[A\quad G\bigg] \bigg)^\frac{1}{2}\\
+         &= \bigg( det \left[\begin{array}{cc} A^T G & A^T G \\  G^T A & G^T G \\ \end{array}\right] \bigg)^\frac{1}{2}\\
+          &= (det A^T A)^\frac{1}{2}(detG^TG - G^TA(A^TA)^{-1}A^TG)^\frac{1}{2}\\
+          &= (detI)^\frac{1}{2}(detG^TG - G^TAI^{-1}A^TG)^\frac{1}{2}\\
+          &= (detG^TG -G^TSG)^\frac{1}{2}\\
+          &= (det X^TX)^ {-\frac{1}{2}}
+  \end{split}
+\end{equation}
+\end{document} 
+
