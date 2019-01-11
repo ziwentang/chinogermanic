@@ -1,0 +1,32 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{geometry}
+\geometry{left=2cm,right=2cm,top=2cm,bottom=2cm}
+
+\title{inference part}
+\author{Shanshan Song}
+\date{8 January 2019}
+
+\begin{document}
+
+\maketitle
+
+\section*{1 General idea}
+     \newcommand\iid{i.i.d.}
+     \newcommand\pN{\mathcal{N}}
+     From the introduction part of the mixed model, we know that $\boldsymbol{Y_i} \sim \pN(X_i\beta, Z_iDZ_i^T+\Sigma_i)$, so we want to test the mean structure and variance components with respect to \boldsymbol{Y_i}. To test the mean structure, that is to test the fixed effects, we mainly apply Wald-test, F-test and likelihood ratio test; To test the variance components, we mainly apply likelihood ratio test and marginal testing. Finally we introduce two alternatives:parametric bootstrap and Kenward and Roger method to resolve some problems existing in above tests.
+    
+\section*{3 Inference for the variance components}
+\subsection*{3.1 Likelihood ratio test}
+\subsubsection*{3.1.1 Assumptions and formulations}
+    Similar as for the fixed effects, a LR test can be derived for comparing nested models with different covariance structures. Suppose that the null hypothesis of interest is now given by $H_0$:$\alpha$ \in $\Theta_{\alpha,0}$, for some subspace $\Theta_{\alpha,0}$ of the parameter space $\Theta_\alpha$ of the variance components $\alpha$. Let $L_{ML}$ denote again the ML likelihood function and let $-2\ln{\lambda_N}$ be the likelihood ratio test statistic which is again defined as
+    \begin{equation}
+    -2\ln{\lambda_N} = -2\ln\left[{\frac{L_{ML}(\hat{\theta}_{ML,0})}{L_{ML}(\hat{\theta}_{ML})}}
+    \right],
+    \end{equation}
+    where $\hat{\theta}_{ML,0}$ and $\hat{\theta}_{ML}$ are now the maximum likelihood estimates obtained from maximizing $L_{ML}$ over $\Theta_{\alpha,0}$ and $\Theta_\alpha$, respectively. It then follows from classical likelihood theory that, under some regularity conditions, $-2\ln{\lambda_N}$ follows, asymptotically under $H_0$, a chi-squared distribution with degrees of freedom equal to the difference between the dimension $s-p$ of $\Theta_\alpha$ and the dimension of $\Theta_{\alpha,0}$.
+    \\ One of the regularity conditions under which the chi-squared approximation is valid is that $H_0$ is not on the boundary of the parameter space $\Theta_\alpha$.
+\subsubsection*{3.1.2 Notes about REML}
+    In contrast to the LR test for fixed effects, valid LR tests are also obtained under REML estimation. The test statistic $-2\ln{\lambda_N}$ still has the same expression as before, but $L_{ML}$ needs to be replaced by the REML likelihood function $L_{REML}$ and the parameter estimates $\hat{\theta}_{ML,0}$ and $\hat{\theta}_{ML}$ are replaced by their corresponding REML estimates. This is because that REML has removed the fixed effects($\beta$) and the test statistic only compares the variance components in two models so that a more accurate test result will be obtained. 
+\end{document}
