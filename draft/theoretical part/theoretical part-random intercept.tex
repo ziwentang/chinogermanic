@@ -1,0 +1,64 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{appendix}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{float}
+\usepackage{subfigure}
+\usepackage[]{caption2}
+\renewcommand{\baselinestretch}{1.5}
+\newcommand\iid{i.i.d.}
+\newcommand\pN{\mathcal{N}}
+\geometry{left=2cm,right=2cm,top=2cm,bottom=2cm}
+
+\title{}
+\author{Ziwen Tang}
+\date{17 February 2019}
+
+\begin{document}
+
+\maketitle
+\section{Random intercept model}
+
+\subsection{Why would random intercept model be considered?}
+In the clustered data observations within the same clusters share the common correlated feature which is not considered in classical linear model.
+Because of independent and homoscedastic residuals, the classical linear model cannot handle intracorrelated responses $y_{ij}$ and $y_{il}$ on the same cluster i appropriatelly.In a word, there exists cluster-specific heterogeneity shared among the measurements in the same cluster.How to use a more precise model to take such heterogeneity explicitly into account? 
+
+First let us have a look at the simplest type of cluster-specific heterogeneity.
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.6]{figure.png}
+\caption{Illustration of random intercept models: both panels show separately estimated regression lines for each cluster. In the left panel, there is no cluster-specific random intercept, while in
+the right panel a random intercept is present. The dashed line corresponds to the population model}
+\label{fig:label}
+\end{figure}
+
+The plots describe the model $y_{ij} = 1 + x_{ij} +\epsilon_{ij}$, , j = 1,…,20, for subject j = 1,…,20 in cluster i=1,…,10, errors $\epsilon_{ij} \stackrel{\text{i.i.d}}{\sim} N(0,0.1^2)$. The dashed line shows the population model. The other lines are drawn from the estimated cluster-specific intercept regression models sharing a common slope across clusters.
+
+\subsection{Random Intercept Model Construction}
+The estimated cluster-specific regression lines still show a common slope across clusters, but the intercept appears to be different from cluster to cluster.
+
+To take correlations between observations of the same cluster 
+into account (at least to some extent), we introduce this type of cluster-specific parameters $\gamma_{0i}$ and obtain equation
+\begin{equation}\label{4}
+Y_{ij} = \beta_0 + \beta_1x_{ij}+\gamma_{0i}+\epsilon_{ij}
+\end{equation}
+
+
+$\beta_0$ is the fixed population intercept.
+
+$\beta_1$ is the fixed population slope.
+
+$\gamma_{0i}$ is the random intercept,also the cluster-specific deviation from the fixed population intercept $\beta_0$, assuming clusters are randomly
+sampled from a larger population and  $\gamma_{0i} \stackrel{\text{i.i.d}}{\sim}  N(0,\tau_0 ^2)$
+
+$\epsilon_{ij}\stackrel{\text{i.i.d}}{\sim} N(0,\sigma^2)$ 
+
+$\beta_0 + \gamma_{0i}$ is the cluster i's mixed intercept to correct for the simpest unobserved heterogeneity induced by omitted covariates., which is randomed with $N (\beta_0,\tau_0 ^2)$.
+
+Assuming that $\epsilon_{ij}$ and $\gamma_{0i}$ is mutually independent, the random intercept model takes $\epsilon_{ij}$ and $\gamma_{0i}$ as  two error terms, where $\gamma_{0i}$ is a within-cluster error and $\epsilon_{ij}$ is a all-obversation error.
+
+Formally, the introduction of random intercept in linear mixed effect models (LMMs) helps to distinguish the conditional (specific cluster-average) mean $E(y_{ij}| \gamma_{0i}) = \beta_0 + \beta_1 x_{ij} + \gamma_{0i}$  and marginal (population-average) mean $ E(y_{ij})= \beta_0 + \beta_1 x_{ij} $ as well as the conditional covariance $Cov(y_{ij}| \gamma_{0i})= \sigma^2 $and marginal covariance $ Cov(y_{ij})= \sigma^2 + \tau_0^2$
+\end{document}
