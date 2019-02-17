@@ -1,0 +1,169 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{appendix}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{float}
+\usepackage{subfigure}
+\usepackage[]{caption2}
+\renewcommand{\baselinestretch}{1.5}
+\newcommand\iid{i.i.d.}
+\newcommand\pN{\mathcal{N}}
+\geometry{left=2cm,right=2cm,top=2cm,bottom=2cm}
+
+\title{}
+\author{Ziwen Tang}
+\date{17 February 2019}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+In this part we will show the likelihood-based approaches to estimate fixed and random effects.First, What coefficients do we need to estimate in LMMs?
+
+Generally, the $N_i$ serial measurements $y_i$ of cluster $i$ are modelled as
+\begin{equation}
+	y_i=X_i\beta + Z_ib_i +\epsilon_i
+\end{equation} 
+In the equation:
+
+Assuming that the random effects $b_i \sim \mathcal{N}(0,D)$ and $\epsilon _i \sim \mathcal{N}(0,\epsilon^2I_N)$, 
+\begin{equation}
+var(y_i) = var(Z_ib_i)+var(\epsilon_i) = Z_iDZ_i^T + \sigma^2I_{N_i}
+\end{equation}
+which allows us to model within-cluster homogeneity. The unconditional distribution of $y_i$ is:
+\begin{equation}
+y_i\sim \mathcal{N}(X_i\beta,Z_iDZ_i^T + \sigma^2I_{N_i})
+\end{equation}
+
+For simplicity, $Z_iDZ_i^T + \sigma^2I_{N_i}$ will be replaced by $H(\alpha)$ ,which is a general covariance matrix parametrized by $\alpha$.
+
+
+In matrix notation, 
+
+$\bm{y}$=$\left[\begin{array}{c}
+y_1 \\
+y_2 \\
+$\vdots$ \\
+y_M \end{array} \right]$,      $\bm{X}$ = $ \left[ \begin{array}{c}
+X_1 \\
+X_2 \\
+$\vdots$ \\
+X_M \end{array} \right]$,      $\bm{Z}$ = $ \left[ \begin{array}{cccc}
+Z_1 & 0 & \cdots & 0 \\
+0 & Z_2 & \cdots& 0 \\
+\vdots & \vdots & \ddots& \vdots\\
+0 & 0& \cdots & Z_M \end{array} \right]$,	$\bm{b} $= $ \left[ \begin{array}{c}
+b_1 \\
+b_2 \\
+$\vdots$ \\
+b_M \end{array} \right]$,      $\epsilon$ = $ \left[ \begin{array}{c}
+\epsilon_1 \\
+\epsilon_2 \\
+$\vdots$ \\
+\epsilon_M \end{array} \right]$. 
+
+
+Thus, with $\bm{H}(\alpha)$ being a diagonal matrix we get \begin{equation}
+	\bm{y}\sim\mathcal{N}\biggl( \bm{X}\beta,\bm{H}(\alpha)= \left[ \begin{array}{cccc}
+	H_1(\alpha) & 0 & \cdots & 0 \\
+	0 & H_2(\alpha)& \cdots& 0 \\
+	\vdots & \vdots & \ddots& \vdots\\
+	0 & 0& \cdots & H_M(\alpha) \end{array} \right] \biggr),	
+\end{equation}
+
+The answer is :We aim to estimate fixed effects regression coefficients $\beta$ as well as model variance-covariance parameters $\bm{H}(\alpha) = Z_iDZ_i^T + \sigma^2I_{N_i} $.
+
+The next question is how we can get the estimated $\beta$ and $\bm{H}(\alpha)$.For intelligibility,we describe the estimation with known $\bm{H}(\alpha)$ in the subsequent part.
+
+\section{Known Variance-covariance Parameters}
+Assuming that $H(\alpha)$ are known, the unknown parameters can be estimated by maximizing the joint log-likelihood of $y$ with respect to $\beta$ and $b$ .
+\begin{equation}
+\widehat {\beta}=(\bm{X}^T\bm{H}^{-1}\bm{X})^{-1}\bm{X}^T\bm{H}^{-1}\bm{y}
+\end{equation}
+\begin{equation}
+\widehat{b}= DZ^TH^{-1}(y-X\widehat{\beta})
+\end{equation}
+We can take $\widehat{\beta}$ as a weighted least squares solution,where the weight matrix is the inverse of the $H(\alpha) = Z_iDZ_i^T + \sigma^2I_{N_i}$.
+
+\section{Unknown Variance-covariance Parameters}
+
+The maximum likelihood and restricted maximum likelihood approaches will be used to estimate unknown parameters $H(\alpha)$.
+
+\subsection{Maximum Likelihood Estimation of $\alpha$}
+Based on the likelihood of  $y \sim \mathcal{N}(X\beta,H(\alpha))$
+The corresponding log-likelihood is
+\begin{equation}\label{1}
+\mathcal{L}(\beta,\alpha|y,X) = - \frac{1}{2}[log det H(\alpha) + (y - X\beta)^TH(\alpha)^{-1}(y - X\beta)].
+\end{equation}
+By maximizing $\mathcal{L}(\beta,\alpha)$ in Equa \ref{1} with respect to $\beta$ (assuming $\alpha$ is fixed), we obtain
+\begin{equation}
+\hat \beta (\alpha) = (X^TH(\alpha)^{-1}X)^{-1}X^TH(\alpha)^{-1}y
+\end{equation}
+Plugging $\widehat \beta (\alpha)$ in $\mathcal{L}(\beta,\alpha)$, the profile log-likelihood is
+\begin{equation}\label{2}
+\mathcal{L}_{ML}(\alpha) = -\frac{1}{2}[log det H(\alpha) + (y-X\hat\beta(\alpha)^TH(\alpha)^{-1}(y - X\hat\beta(\alpha))]
+\end{equation}
+The maximization of $\mathcal{L}_{ML}(\alpha)$  with respect to $\alpha$ results in the ML estimator $\widehat\alpha_{ML}$.
+Refer to Harville(1977) for explicit formulae and algorithms.
+We will prove that $\widehat\alpha_{ML}$ is biased downwards in the following section.
+
+\subsection{Restricted Maximum Likelihood Estimation of $\alpha$}
+The intuition behind ReML \cite{[Patterson and Thompson,
+1971] [Harville, 1974]} is to maximize a modified likelihood that bypasses estimating $\beta$ first instead of the profile log-likelihood in Equa \ref{2}.
+
+Integrating out $\beta$ from the likelihood in Equa \ref{1}, the resticted log-likelihood is
+\begin{equation}
+\mathcal{L}_R(\alpha) = log(\int \mathcal{L}(\beta,\alpha)d\beta)
+\end{equation}
+But how to integrate out $\beta$ from the likelihood? Is any information lost for estimating $\alpha$ without information on $\beta$?
+
+The solution is to find vector $a$ is orthogonal to all columns of X, i.e., $a^T X = 0 $,then $a^T y$ is called as an error contrast.We can then proceed to maximize the likelihood based on $a^T y$ which free of $\beta$. 
+
+Define $A$ is linearly independent with x, $A^T X = 0$, $ A^T y = A^T ( Z b +\epsilon)$.Then we derive that $E(A^T y) = 0$ and $var(A^T y) = A^T H A$. 
+
+The error contrast vector does not involve any of the fixed effect parameters. 
+\begin{equation}\label{eq1} 
+         A^T y \sim \mathcal{N}(0,A^T H A)
+\end{equation}
+The maximization of $\mathcal{L}_{ML}(\alpha)$  with respect to $\alpha$ results in the ML estimator $\widehat\alpha_{ML}$.
+There is no information loss for estimating $\alpha$ when inference is based on $A^T y$ rather than on $y$ \cite{[Patterson and Thompson, 1971]}.We can obtain $\widehat\alpha_{ML}$ by maximizing a restricted log-likelihood function $L_R(\alpha| A^T y)$. 
+
+The restricted log-likelihood\cite{[Harville, 1974]} is
+\begin{equation}\label{3} 
+\begin{split}
+{\mathcal{L}}_R(\alpha) &= log(\int \mathcal{L}(\beta,\alpha)d\beta) ={\mathcal{L}}_R (\alpha| A^T y)\\
+&= -\frac{1}{2}\text{log det}\bm{H}-\frac{1}{2}\text{log det}\bm{X}^T\bm{H}^{-1}\bm{X}-\frac{1}{2}(\bm{y}-\bm{X}\hat{\beta})^TH^{-1}(\bm{y}-\bm{X}\hat{\beta}) \\
+&= -\frac{1}{2}\text{log}\prod_{i=1}^{M} \text{det}H_i-\frac{1}{2}\text{log}\prod_{i=1}^{M} \text{det} X_i^TH_i^{-1}X_i-\frac{1}{2}\sum_{i=1}^{M}(y_i-X_i\hat{\beta})^TH_i^{-1}(y_i-X_i\hat{\beta})\\
+&= -\frac{1}{2}\sum_{i=1}^{M} \text{log det}H_i-\frac{1}{2}\sum_{i=1}^{M} \text{log det} X_i^TH_i^{-1}X_i-\frac{1}{2}\sum_{i=1}^{M}(y_i-X_i\hat{\beta})^TH_i^{-1}(y_i-X_i\hat{\beta})
+\end{split}
+\end{equation}
+Where
+\begin{equation}
+\begin{split}
+\hat{\beta}&=(\bm{X}^T\bm{H}^{-1}\bm{X}^T\bm{H}^{-1}\bm{y})\\
+&=\bigl(\sum_{i=1}^{M}X_i^TH_i^{-1}X_i\bigr)^{-1}\sum_{i=1}^{M}X_i^TH_i^{-1}y_i.
+\end{split}
+\end{equation}
+Equa \ref{3} is used to obtain the estimators of variance-covariance matrix $H(\alpha)$ and corresponding regression coefficients $\beta$.
+Iterative algorithm (Newton Raphson or Fisher scoring) is employed for computing the estimators in Equa \ref{2} and Equa \ref{3}.\cite{ [Lindstromand Bates, 1988]}
+
+\subsection{why ML estimator is biased, REML not}
+The bias of an estimator means the deviation between the expected value and the true value.
+In the classical linear model,the unbiased estimator 
+\begin{equation}
+    {\hat{\sigma}}^2_{unbiased} = \frac1{N-K}(y-X\hat{\beta})^T(y-X\hat{\beta})
+\end{equation}
+The expected value of ML estimator \cite{[Verbeke and Molenberghs, 2009]},
+\begin{equation}
+E[{\hat{\sigma}}^ 2_{ML}] = \frac{N-K}{N}\sigma^2_{unbiased}<\sigma^2_{unbiased}.
+\end{equation}
+Obviously,${\hat{\sigma}}^ 2_{ML}$ is biased downwards.
+
+In LMMs, biased $ \hat{\alpha}_{ML}$ originates from the loss of degree of freedom for estimating mean components $\hat{\beta}$, since ML is based on the profile log-likelihood (variance-covariance $\alpha$ is fixed).The estimation would be unbiased,if we estimated variance components with true mean component values. However, REML bypasses estimating $\beta$ first and can produce unbiased estimators for $\alpha$ by using a modified log-likelihood.
+The bias-free REML estimation is the main reason for preferring $\hat\alpha_{REML}$ in LMM as a unbiased estimator for $\alpha$ than $\hat\alpha_{ML}$.
+\end{document}
