@@ -1,0 +1,148 @@
+\documentclass[a4paper,11pt]{article} 
+% Load some standard packages
+\usepackage{amsmath,parskip,fullpage,natbib,bm} 
+
+% Load tikz for the tree diagram
+\usepackage{tikz}
+\usetikzlibrary{trees,shapes}
+
+% Define my own commands
+\newcommand{\info}{{\cal I}}
+\newcommand{\E}{\text{E}}
+
+% Bibliography style
+\bibliographystyle{agsm}
+
+ \begin{document}
+\section{Monte Carlo Simulation}
+
+ 	This chapter of the paper will try to test the model's performance in a Monte Carlo simulation set up. We are going to create a simple linear mixed effects model and simulate data with it. This data will then be used to assess the distribution of the estimators and the bias of the fixed effects estimators, specifically.    
+ 	
+ 	\section{Model}
+ 	Imagine a simple mixed effects model with a cluster specific random effect and one fixed effect. FIRSTLY the random effect takes the form of a random intercept only, to which we will later add a random slope. This beeing said,the model takes following form:
+ 		\begin{equation}\label{eq:model1}
+ 	y_{ij}=\beta_0+\beta_1x_{ij}+\gamma_{0i}+\epsilon_{ij}
+ 	\end{equation}
+  		
+ 	Where $i=1,...,m$ is the number of clusters and $j=1,...,n_i$ the number of repeated measurements, the errors $\epsilon_{ij}$$\sim\mathcal{N}(0,\epsilon^2)$ are i.i.d., $\beta_0$ is the fixed intercept, $\gamma_{0i}$ is the cluster-specific deviation from the fixed intercept $\beta_0$.
+ 	Thus $\beta_0+\gamma_{0i}$ is the (random) intercept for cluster $i$ and $\beta_1$ is a fixed slope parameter that is common across clusters.
+ 	\\
+ 	\\
+ 	Our second model includes a random slope parameter:
+ 	 	
+ 		\begin{equation}\label{eq:model2}
+ 	y_{ij}=\beta_0+(\beta_1+\gamma_{1i})*x_{ij}+\gamma_{0i}+\epsilon_{ij}
+ 	\end{equation}
+ 	Where we add $\gamma_{1i}$ to the previous model, thus adding a random component to the slope. Now $\beta_1+\gamma_{1i}$ is the slope for cluster $i$, with $\gamma_{1i}$ being its cluster specific deviation from the parameter $\beta_1$. 
+ 	
+ 
+ 	
+	\section{Simulation}
+	\subsection{Set up}
+	The goal of simulating the first model, without random slope, is to check for unbiasedness of our fixed effects estimators and to observe the distribution of both fixed effects and the random variance estimator. In order to perform a Monte Carlo simulation we have to manually set the true values of the model parameters, as well as ne number of simulations, the amount of clusters and the number of observations within each cluster. We set the errors to be random draws from a normal distribution of the form $\mathcal{N}(0,1)$, $\beta_0=1$, $\beta_1=1.2$, $\gamma_{0i}$ are $m$ random draws from a normal distribution with mean zero and $\sigma^2=4$. For observations $x_{ij}$ we take $j*m$ random draws from $\mathcal{N}(80,30)$, with amounts of clusters $m={5,30,100}$ and $j=30$ repeated repeated measurements by cluster. We then repeat this simulation $n=1000$ times.
+	\\
+	To simulate our second model we have to set 
+	\subsection{Results}
+	After having simulated three data sets with $1000*m*j$ observations each, we use restricted maximum likelihood to estimate the fixed effects estimators and the random effect varaince.
+	
+	To assess the quality of our estimation we check if, as stated in the theoretical part, the estimator $\hat\beta_1$ is unbiased and have a look at its mean squared error (MSE). The bias of an estimator is defined by 
+	\begin{equation}
+		Bias(\hat{\beta_{n}})=E(\hat{\beta_n})-\beta
+	\end{equation}
+	If $E(\hat{\beta_n})=\beta$ then $Bias(\hat{\beta_{n}})=0$ and the estimator is called unbiased.\\
+	The MSE corresponds to the expected quadratic loss of $\beta$ and can be interpreted as the expected performance of an estimator.
+	\begin{equation}\label{eq:MSE}
+		E((\hat{\beta_{n}}-\beta_{n})^2)=Bias(\hat{\beta_{n}})^2+var(\hat{\beta_{n}})
+	\end{equation}
+	Table\ref{table:1} summarizes the results of our claculations for our MSE and Bias by amount of clusters (nclusters).
+	
+	\begin{table}[h!]
+		\centering
+		\begin{tabular}{||c c c c c c||} 
+			 \hline
+			\multicolumn{6}{|c|}{Random Intercept Model:$\hat{\beta_1}$} \\
+			
+			\hline
+			nclusters & $E(\hat{\beta_1})$ & $sd(\hat{\beta_1})$ & $Var(\hat{\beta_1})$ & Bias & MSE \\ [0.5ex] 
+			\hline
+			100 & 1.200 & 0.001 & 	2.178e-06 & 	-2.091e-05 & 2.176e-06 \\ 
+			20 & 1.200 & 0.003 & 1.174e-05 & 		3.998e-05 & 1.173e-05  \\ 	
+			5 & 1.200 & 0.007 & 4.823e-05 & 	1.127e-04 & 4.819e-05  \\ 
+	[1ex] 
+			\hline
+		\end{tabular}
+		\caption{Results of a Monte Carlo simulation with 1000 repetitions on model \ref{eq:model1}}
+		\label{table:1}
+	\end{table}
+	Table \ref{table:1} shows that for any number of clusters  our estimates are equal to the true parameter value $\beta_1=1.2$.  $E(\hat{\beta_1})$ is the mean of all simulated estimatiors $\hat{\beta_1}$ for their respective amount of clusters $m$. The corresponding standard deviations $sd(\hat{\beta_1})$ are close to zero. Comparing the order of magnitude of the bias to the one of $\beta_1$ the bias is sufficiently close to zero to say that $\hat{\beta_{n}}$ is unbiased. 
+	\\	Note that in our case MSE is reported to be bigger than the variance. This is mathematically impossible and stems from the fact that the variance in Table \ref{table:1} is unbiased. In contrast, the variance in the MSE formula corresponds to the biased case of $var(\hat{\beta_{n}})=\sigma^2/n$. Once this is accounted for equation \ref{eq:MSE} holds.
+	\\
+	When increasing the number of observations by increasing the number of clusters, the estimates get more precise. The absolute bias, MSE and variance are all decreasing with the number of observations, suggesting consistency.
+	\\ 
+
+
+
+	\begin{table}[h!]
+	\centering
+	\begin{tabular}{||c c c c c c||} 
+		\hline
+		\multicolumn{6}{|c|}{Random Slope and Intercept Model: $\hat{\beta_1}$} \\
+		
+		\hline
+		nclusters & $E(\hat{\beta_1})$ & $sd(\hat{\beta_1})$ & $Var(\hat{\beta_1})$ & Bias & MSE \\ [0.5ex] 
+		\hline
+		100 &1.200 &0.002&2.673e-06&-9.263e-05&2.679e-06 \\ 
+		20 &1.200 &0.004&1.246e-05&1.319e-04& 1.247e-05 \\ 	
+		5 & 1.200	&0.007&5.344e-05&	2.505e-04&5.345e-05 \\ 
+		[1ex] 
+		\hline
+	\end{tabular}
+	\caption{Results of a Monte Carlo simulation with 1000 repetitions on model \ref{eq:model2} }
+	\label{table:2}
+\end{table}
+
+	According to Table \ref{table:2} adding a random effect to the slope parameter does not impact our estimation precision for $\hat{\beta_1}$. The model still does a very good job at finding unbiased estimates and the observations of the previous paragraphs hold true. As claimed previously in the theoretical part the estimator is still unbiased.
+	
+	Comparing the estimaiton results of the intercept of both models in table \ref{table:3} and \ref{table:4} leads to a slightly different conclusion. Whereas the estimation of the slope did  not seem to be affected by the addition of more variation in the model, the properties of $\hat{\beta_0}$ seem to suffer more. The resuslts are more biased in model \ref{eq:model2}, even thought increasing the number of observations helps to reduce this bias. 
+	Also, $\hat{\beta_0}$ is less significant for $nclusters=5$ in both models. This is connected to the fact that the model needs enough nclusters to precisely estimate the variance of the random effects as illustrated in FIGUREX. Thus having precise estimates of the random effects variance is critical to obtain singificant results for the intercept.
+	 
+	The distributions of the fixed effects and random effects estimators can be found in the appendix.
+		\begin{table}[h!]
+		\centering
+		\begin{tabular}{||c c c c c c c c||} 
+			\hline
+			\multicolumn{8}{|c|}{Random Intercept Model: $\hat{\beta_0}$} \\
+			
+			\hline
+			nclusters & $E(\hat{\beta_0})$ & $sd(\hat{\beta_0})$& t-value & p-value &$Var(\hat{\beta_0})$ & Bias & MSE \\ [0.5ex] 
+			\hline
+			100 & 1.001 & 0.122&8.18 &0.000***	&0.015 &0.001 &   0.015 \\ 
+			20 & 0.989 &	0.277&3.57 &0.000*** &0.077 &-0.011 &  0.077  \\ 	
+			5 & 	0.990&  0.559& 1.77&0.038**  &0.313 &-0.001 &   0.313 \\ 
+			[1ex] 
+			\hline
+		\end{tabular}
+		\caption{Results of a Monte Carlo simulation with 1000 repetitions on model \ref{eq:model1}. \\*p$<.05$; **p$<.01$; ***p$<0.001$}
+				\label{table:3}
+	\end{table}
+
+\begin{table}[h!]
+	\centering
+	\begin{tabular}{||c c c c c c c c||} 
+		\hline
+		\multicolumn{8}{|c|}{Random Slope and Intercept Model: $\hat{\beta_0}$} \\
+		
+		\hline
+		nclusters & $E(\hat{\beta_0})$ & $sd(\hat{\beta_0})$&t-value &p-value &$Var(\hat{\beta_0})$ & Bias & MSE \\ [0.5ex] 
+		\hline
+		100 &1.006&0.132&7.621&0.000*** &0.017&0.006& 0.018\\ 
+		20 &0.988&0.285&3.502&0.000*** &0.081&-0.012&0.081 \\ 	
+		5 &0.975&0.585&1.667&0.096* &0.343&-0.0252& 0.343\\ 
+		[1ex] 
+		\hline
+	\end{tabular}
+	\caption{Results of a Monte Carlo simulation with 1000 repetitions on model \ref{eq:model2}. \\*p$<.05$; **p$<.01$; ***p$<0.001$}
+	\label{table:4}
+\end{table}
+		
+\end{document} 
