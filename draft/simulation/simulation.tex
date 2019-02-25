@@ -19,7 +19,7 @@
  	This chapter of the paper will try to test the model's performance in a Monte Carlo simulation set up. We are going to create a simple linear mixed effects model and simulate data with it. This data will then be used to assess the distribution of the estimators and the bias of the fixed effects estimators, specifically.    
  	
  	\section{Model}
- 	Imagine a simple mixed effects model with a cluster specific random effect and one fixed effect. FIRSTLY the random effect takes the form of a random intercept only, to which we will later add a random slope. This beeing said,the model takes following form:
+ 	Imagine a simple mixed effects model with a cluster specific random effect and one fixed effect. Firstly the random effect takes the form of a random intercept only, to which we will later add a random slope. This beeing said,the model takes following form:
  		\begin{equation}\label{eq:model1}
  	y_{ij}=\beta_0+\beta_1x_{ij}+\gamma_{0i}+\epsilon_{ij}
  	\end{equation}
@@ -41,7 +41,7 @@
 	\subsection{Set up}
 	The goal of simulating the first model, without random slope, is to check for unbiasedness of our fixed effects estimators and to observe the distribution of both fixed effects and the random variance estimator. In order to perform a Monte Carlo simulation we have to manually set the true values of the model parameters, as well as ne number of simulations, the amount of clusters and the number of observations within each cluster. We set the errors to be random draws from a normal distribution of the form $\mathcal{N}(0,1)$, $\beta_0=1$, $\beta_1=1.2$, $\gamma_{0i}$ are $m$ random draws from a normal distribution with mean zero and $\sigma^2=4$. For observations $x_{ij}$ we take $j*m$ random draws from $\mathcal{N}(80,30)$, with amounts of clusters $m={5,30,100}$ and $j=30$ repeated repeated measurements by cluster. We then repeat this simulation $n=1000$ times.
 	\\
-	To simulate our second model we have to set 
+	To simulate our second model we have to set the distribution of the random slope parameter $\gamma_{1i}$. Here we choose $\gamma_{1i}\sim\mathcal{N}(0,2)$, adding more variation to the model. For the remaining values we take the previous ones, to make the models more comparable.
 	\subsection{Results}
 	After having simulated three data sets with $1000*m*j$ observations each, we use restricted maximum likelihood to estimate the fixed effects estimators and the random effect varaince.
 	
@@ -101,10 +101,10 @@
 	\label{table:2}
 \end{table}
 
-	According to Table \ref{table:2} adding a random effect to the slope parameter does not impact our estimation precision for $\hat{\beta_1}$. The model still does a very good job at finding unbiased estimates and the observations of the previous paragraphs hold true. As claimed previously in the theoretical part the estimator is still unbiased.
+	According to Table \ref{table:2} adding a random effect to the slope parameter does not impact our estimation precision for $\hat{\beta_1}$. The model still does a very good job at finding unbiased estimates and the observations of the previous paragraphs hold true. As claimed previously in the estimation part the estimator is still unbiased.
 	
 	Comparing the estimaiton results of the intercept of both models in table \ref{table:3} and \ref{table:4} leads to a slightly different conclusion. Whereas the estimation of the slope did  not seem to be affected by the addition of more variation in the model, the properties of $\hat{\beta_0}$ seem to suffer more. The resuslts are more biased in model \ref{eq:model2}, even thought increasing the number of observations helps to reduce this bias. 
-	Also, $\hat{\beta_0}$ is less significant for $nclusters=5$ in both models. This is connected to the fact that the model needs enough nclusters to precisely estimate the variance of the random effects as illustrated in FIGUREX. Thus having precise estimates of the random effects variance is critical to obtain singificant results for the intercept.
+	Also, $\hat{\beta_0}$ is less significant for $nclusters=5$ in both models. This is connected to the fact that the model needs enough nclusters to precisely estimate the variance of the random effects as illustrated in FIGUREX. Thus having precise estimates of the random effects variance seems critical to obtain singificant results for the intercept.
 	 
 	The distributions of the fixed effects and random effects estimators can be found in the appendix.
 		\begin{table}[h!]
@@ -122,7 +122,7 @@
 			[1ex] 
 			\hline
 		\end{tabular}
-		\caption{Results of a Monte Carlo simulation with 1000 repetitions on model \ref{eq:model1}. \\*p$<.05$; **p$<.01$; ***p$<0.001$}
+		\caption{Results of a Monte Carlo simulation with 1000 repetitions on model \ref{eq:model1}. *p$<.05$; **p$<.01$; ***p$<0.001$}
 				\label{table:3}
 	\end{table}
 
@@ -141,7 +141,7 @@
 		[1ex] 
 		\hline
 	\end{tabular}
-	\caption{Results of a Monte Carlo simulation with 1000 repetitions on model \ref{eq:model2}. \\*p$<.05$; **p$<.01$; ***p$<0.001$}
+	\caption{Results of a Monte Carlo simulation with 1000 repetitions on model \ref{eq:model2}. *p$<.05$; **p$<.01$; ***p$<0.001$}
 	\label{table:4}
 \end{table}
 		
