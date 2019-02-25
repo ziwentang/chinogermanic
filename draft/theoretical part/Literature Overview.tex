@@ -1,0 +1,28 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{appendix}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{float}
+\usepackage{subfigure}
+\usepackage[]{caption2}
+\usepackage[pdftex,colorlinks=true,linkcolor=black,citecolor=blue]{hyperref}
+\renewcommand{\baselinestretch}{1.5}
+\newcommand\iid{i.i.d.}
+\newcommand\pN{\mathcal{N}}
+
+\geometry{left=2cm,right=2cm,top=2cm,bottom=2cm}
+
+\title{Literature Overview}
+\author{Shanshan Song}
+\date{10 February 2019}
+
+\begin{document}
+\bibliographystyle{plain}
+\nocite{*}
+Before we go deeper into our topic in this paper, many valuable books and articles regarding linear mixed models should be mentioned. Basic mixed models and more generalized mixed models are well defined in \cite{Fahrmeir}, which helps us build a clear model framework in the beginning. In \cite{Tutorial}, a detailed introduction of REML estimation method in LMM has been given out which gives us a hint of doing estimation part in this paper. \cite{Verbeke} illustrates the ideas behind softwares like SAS and also implements the inference of parameters deeply. Article \cite{KR} shows two popular inference methods, Kenward and Roger and parametric bootstrap, for linear mixed model. Since R is a popular statistical software for linear mixed model, \cite{Faraway} talks about extending the linear model methodology using R statistical software, and some useful syntax are also applied in this paper. Bates has been a famous economist who did a great contribution to the development of mixed model. In his article \cite{Bates}, the structure of the model, the steps in evaluating the profiled deviance or REML criterion, and the structure of classes or types that represents such a model are described.
+
+\bibliography{paper}
+\end{document}
