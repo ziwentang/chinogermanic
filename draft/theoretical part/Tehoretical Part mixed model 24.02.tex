@@ -1,0 +1,186 @@
+\documentclass[a4paper,11pt]{article} 
+% Load some standard packages
+\usepackage{amsmath,parskip,fullpage,natbib,bm} 
+
+% Load tikz for the tree diagram
+\usepackage{tikz}
+\usetikzlibrary{trees,shapes}
+
+\usepackage[utf8]{inputenc}
+\usepackage{appendix}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{float}
+\usepackage{subfigure}
+\usepackage[]{caption2}
+\renewcommand{\baselinestretch}{1.5}
+\newcommand\iid{i.i.d.}
+\newcommand\pN{\mathcal{N}}
+\geometry{left=2cm,right=2cm,top=2cm,bottom=2cm}
+
+% Define my own commands
+\newcommand{\info}{{\cal I}}
+\newcommand{\E}{\text{E}}
+
+% Bibliography style
+\bibliographystyle{agsm}
+
+ \begin{document}
+
+ 		
+ 		\section{Introduction to Linear Mixed Models:}
+ 			
+ 		
+ 		
+ 		
+ 		When working with data in econometrics, we have to worry about the data’s structure. Mostly there is some sort of grouping structure. It can be simple, where one grouping factor belongs to one single group or more complex. The data could have nested or hierarchical structures, or spatial elements.  In the common case of longitudinal data we have repeated measures over time of one cross-sectional element.\\ 
+ 		In all of the cases above we would assume some relation within a specific group (cross-sectional element). However, one of the standard assumptions of traditional ‘pooled’ linear regression models is that residuals are independently and identically distributed (i.i.d.). This means that after considering for all covariates, there are no correlations left between measures. By implementing this on longitudinal data of a population sample, we would assume that any two individuals of this population are identical, for example. In many cases this assumption is unreasonable. Especially with hierarchical data and temporal hierarchies that are often characterized by dependence over time (\cite{Bell}) errors are unlikely to be i.i.d..\\
+ 		Random effects can model these grouping structures. Instead of trying to estimate the value of the random effects we will estimate the variance of their distribution. This distribution is expected to be different for each group we are accounting for. Thus accounting for heterogeneity across groups and improving the model by making the assumptions more realistic. One of the advantages of random effects compared to a classical regression set up with fixed effects, is that it can save us many degrees of freedom. Instead of estimating a fixed effect parameter for each subject within a group, we only have to estimate the variance of the group’s distribution. Consequently, we would use random effects in the case where we are not too interested in the specific effect of each subject of a group, but still want to account for it because we expect correlations within groups.
+ \\
+	Before we go deeper into our topic of this paper, many valuable books and articles regarding linear mixed models should be mentioned. Basic mixed models and more generalized mixed models are well defined in \cite{Fahrmeir}, which helps us build a clear model framework in the beginning. In \cite{Tutorial}, a detailed introduction of REML estimation method in LMM has been given out which gives us a hint of doing estimation part in this paper. \cite{Verbeke} illustrates the ideas behind softwares like SAS and also implements the inference of parameters deeply. Article \cite{KR} shows two popular inference methods, Kenward and Roger and parametric bootstrap, for linear mixed model. Since R is a popular statistical software for linear mixed model, \cite{Faraway} talks about extending the linear model methodology using R statistical software, and some useful syntax are also applied in this paper. Bates has been a famous economist who did a great contribution to the development of mixed model. In his article \cite{Bates}, the structure of the model, the steps in evaluating the profiled deviance or REML criterion, and the structure of classes or types that represents such a model are described.
+	
+\section{Linear Mixed Effects Models:}
+
+In mixed effects models we consider both, random and fixed effects at the same time. Generally, the 
+$N_i$ repeated measurements  $y_i$ of subject/cluster $i$ are modelled as
+\begin{equation}
+	y_i=X_i\beta + Z_ib_i +\epsilon_i
+\end{equation}
+with $X_i$ being cluster $i$’s $n_i*p$  design matrix containing fixed effects observations, beta the fixed effects regression coefficient vector of length $p$ to be estimated, $Z_i$’columns contain the subset of $X_i$’s we want to account for by random effects $b_i$, with epsilon being the residuals not explained by either fixed or random effects. More precisely, any component of $\beta$ can be allowed to vary randomly on the subject specific level by simply including the corresponding columns of $X$ in $Z$ (Bernal-Rusiel et al. , 2013). This is the key advantage of mixed effects models: they allow to account for unobserved heterogeneity induced by omitted covariates \cite{Fahrmeir}).
+ We will have a closer look at this in the subsequent sections.\\
+Here, the assumptions made on the model are 
+\begin{align*}
+b_i &\sim \mathcal{N}(0,D)\\
+\epsilon _i &\sim \mathcal{N}(0,\epsilon^2I_N)\\
+\epsilon_1&,...,\epsilon_M,b_1,...,b_M   \text{independent},
+\end{align*}
+
+M is the number of clusters and $b_i$ represents the deviations of cluster $i$ from the populations coefficients for the subset $Z_i$, with D being the covariance matrix of $b_i$’s distribution. This allows subjects to deviate from the populations values, accounting for inter-cluster variability \cite{Tutorial}.\\
+The beauty of including random effects in our standard model is that it also permits us to model intra-cluster measurement correlations. To show this, we will first distinguish the marginal (population-average) mean $E(y_i)$ from the conditional (cluster-specific) mean $E(y_i|b_i)$:
+\begin{align*}
+		E(y_i)&=X_i\beta\\
+		E(y_i|b_i)&=X_i\beta+Z_Ib_i
+\end{align*}
+Now we can compute the cluster-specific covariance $Cov(y_i|b_i)$ and the population-average covariance $Cov(y_i)$:
+\begin{align*}
+	Cov(y_i|b_i)&=Cov(\epsilon_i)=\sigma^2I_{N_i}\\
+	Cov(y_i)&=Cov(Z_ib_i)+Cov(\epsilon_i)=Z_iDZ_i^T+\sigma^2I_{N_i}
+\end{align*}
+While $\sigma^2$ is a diagonal matrix, $Z_iDZ_i^T$ is not. Hence, the addition of both, $Cov(y_i)$, is a matrix with off-diagonal elements, which enables us to model intra-subject measurement correlations.
+Putting everything together, we get the common notation:
+\begin{equation}\label{xy}
+	y_i \sim\mathcal{N}(X_i\beta,H_i(\theta)),
+\end{equation}
+with $H_i=Z_iDZ_i^T + \sigma^2I_{N_i}$\\
+ In the following section we will introduce two types of linear mixed effect models, to later explain the relevant estimation techniques. 
+ 
+
+
+
+
+
+\section{Random intercept model}
+
+\subsection{Why would random intercept model be considered?}
+In the clustered data observations within the same clusters share the common correlated feature which is not considered in classical linear model.
+Because of independent and homoscedastic residuals, the classical linear model cannot handle intracorrelated responses $y_{ij}$ and $y_{il}$ on the same cluster i appropriatelly. In a word, there exists cluster-specific heterogeneity shared among the measurements in the same cluster.How to use a more precise model to take such heterogeneity explicitly into account? 
+
+First let us have a look at the simplest type of cluster-specific heterogeneity.
+\begin{figure}[ht]
+	\centering
+	\includegraphics[scale=0.6]{RIM.png}
+	\caption{Illustration of random intercept models: both panels show separately estimated regression lines for each cluster. In the left panel, there is no cluster-specific random intercept, while in the right panel a random intercept is present. The dashed line corresponds to the population model}
+	\label{fig:label}
+\end{figure}
+
+The plots describe the model $y_{ij} = 1 + x_{ij} +\epsilon_{ij}$, , j = 1,…,20, for subject j = 1,…,20 in cluster i=1,…,10, errors $\epsilon_{ij} \stackrel{\text{i.i.d}}{\sim} N(0,0.1^2)$. The dashed line shows the population model. The other lines are drawn from the estimated cluster-specific intercept regression models sharing a common slope across clusters.
+
+\subsection{Random Intercept Model Construction}
+The estimated cluster-specific regression lines still show a common slope across clusters, but the intercept appears to be different from cluster to cluster.
+
+To take correlations between observations of the same cluster 
+into account (at least to some extent), we introduce this type of cluster-specific parameters $\gamma_{0i}$ and obtain equation
+\begin{equation}\label{4}
+y_{ij} = \beta_0 + \beta_1x_{ij}+\gamma_{0i}+\epsilon_{ij}
+\end{equation}
+
+	Where $i=1,...,m$ is the number of clusters and $j=1,...,n_i$ the number of repeated measurements, the errors $\epsilon_{ij}$$\sim\mathcal{N}(0,\sigma^2)$ are i.i.d., $\beta_0$ is the fixed population intercept and $\beta_1$ is a fixed slope parameter that is common across clusters.. $\gamma_{0i}$ is the random intercept, also the cluster-specific deviation from the fixed population intercept $\beta_0$, assuming clusters are randomly
+	sampled from a larger population and  $\gamma_{0i} \stackrel{\text{i.i.d}}{\sim}  N(0,\tau_0 ^2)$.   
+$\beta_0 + \gamma_{0i}$ is the cluster $i$'s mixed intercept to correct for the simpest unobserved heterogeneity induced by omitted covariates., which is randomed with $N (\beta_0,\tau_0 ^2)$.
+
+Assuming that $\epsilon_{ij}$ and $\gamma_{0i}$ are mutually independent, the random intercept model takes $\epsilon_{ij}$ and $\gamma_{0i}$ as  two error terms, where $\gamma_{0i}$ is a within-cluster error and $\epsilon_{ij}$ is a all-obversation error.
+
+Formally, the introduction of random intercept in linear mixed effect models helps to distinguish the conditional (specific cluster-average) mean $E(y_{ij}| \gamma_{0i}) = \beta_0 + \beta_1 x_{ij} + \gamma_{0i}$  and marginal (population-average) mean $ E(y_{ij})= \beta_0 + \beta_1 x_{ij} $ as well as the conditional covariance $Cov(y_{ij}| \gamma_{0i})= \sigma^2 $ and marginal covariance $ Cov(y_{ij})= \sigma^2 + \tau_0^2$
+
+Finally we can summarize the different interpretations of the random intercept model.
+The classical interpretation says clusters are a random sample of a larger
+population and the $\gamma_{0i}$ are cluster-specific random effects. Whereas the marginal interpretation says random effects $\gamma_{0i}$ induce the general linear
+model with correlated errors for the observed $y_{ij}$ (\cite{Fahrmeir}).
+
+
+\section{Random Slope Model}
+From the random intercept model discussed above, we know that it is based on the assumption that the relationship between the covariate and response is the same in every group. However, sometimes the effect of the covariate may differ from group to group and this may be of interest. One case is that the intercept for the regression lines looks identical (or at least close) but the slopes are obviously different, as the left panel of figure \ref{fig:label2} shows. A more typical case is that all regression lines show both cluster-specific intercepts and slopes, as seen on the right panel of figure \ref{fig:label2} shows (\cite{Fahrmeir}).
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[scale=0.6]{RSM.png}
+	\caption{Illustration of random slope models: both panels show separately estimated regression lines for each cluster. In the left panel, there is no cluster-specific random intercept but random slopes, while in the right panel both are present. The dashed line corresponds to the population model}
+	\label{fig:label2}
+\end{figure}
+\subsection{Random Slope Model Construction}
+We build on the previous random intercept model (\ref{4}) and get
+\begin{equation}
+y_{ij} = \beta_0 + \beta_1x_{ij} + \gamma_{0i} + \gamma_{1i}x_{ij} + \epsilon_{ij} 
+\end{equation}
+	where we add $\gamma_{1i}$ to the previous model, adding a random component to the slope. Now $\beta_1+\gamma_{1i}$ is the slope for cluster $i$, with $\gamma_{1i}$ being the cluster-specific effect of $x$. Allowing us to 
+
+\begin{flalign}
+&\boldsymbol{\gamma}_i = \left(
+\begin{array}{c}
+\gamma_{0i}\\
+\gamma_{1i}
+\end{array}
+\right)
+\overset{i.i.d.}{\sim} \pN \left( \left(
+\begin{array}{c}
+0\\
+0
+\end{array}
+\right),  \left(
+\begin{array}{cc}
+\tau_0^2 & \tau_{01}\\
+\tau_{10} & \tau_1^2\\
+\end{array}
+\right)
+\right) 
+, \quad \left(
+\begin{array}{cc}
+\tau_0^2 & \tau_{01}\\
+\tau_{10} & \tau_1^2\\
+\end{array}
+\right) = \boldsymbol{D} 
+\end{flalign}
+We can see that cluster-specific parameter vector $\boldsymbol{\gamma}_i$ has a bivariate normal random effects distribution with mean vector $\boldsymbol{0}$ and symmetric covariance matrix $\boldsymbol{D}$. The variances of $\gamma_{0i}$ and $\gamma_{1i}$ are $\tau_0^2$ and $\tau_1^2$ respectively, which determine the variability of cluster-specific intercepts and slopes. In the present example of figure \ref{fig:label2}, the values corresponding to the left panel are $\tau_0^2\approx0$ and $\tau_1^2>0$, while in the right panel $\tau_0^2>0$ as well.
+The correlation between random intercepts and slopes is captured by $\tau_{01}$ and $
+\tau_{10}$. Such a correlation is unequal to zero when clusters with smaller slopes tend to also have smaller intercepts, for example.
+
+\subsection{Correlation structure of observations}
+We firstly get the marginal heteroscedastic variance of $y_{ij}$
+\begin{equation}
+Var(y_{ij}) = \tau_0^2 + 2\tau_{01}x_{ij} + \tau_1^2{x_{ij}}^2 + \sigma^2
+\end{equation}
+See a derivation in Appendix. Covariate $x_{ij}$ can affect the variance of $y_{ij}$. The covariance between $y_{ij}$ and $y_{ir}$ is shown to be (\cite{Fahrmeir})
+\begin{equation}
+Cov(y_{ij},y_{ir}) = \tau_0^2 + \tau_{01}x_{ij} + \tau_{01}x_{ir} + \tau_1^2x_{ij}x_{ir}
+\end{equation}
+In a further step we get an intraclass correlation coefficient
+\begin{equation}
+Corr(y_{ij},y_{ir}) = \frac{Cov(y_{ij},y_{ir})}{Var(y_{ij})^{1/2}Var(y_{ir})^{1/2}}
+\end{equation}
+This coefficient has a rather complex form depending on observed $x$ values and we cannot interpret easily.
+
+Generally, the linear mixed effects model is useful when the data structure suggests there are good arguments for fixed and random effects, as opposed to the case where either one is preferred. We can account for population and cluster effects by allowing for correlations between observations within those clusters. This way we obtain correct standard errors, confidence intervals and tests, improving inference  concerning our coefficients. The following chapter will try to cover the estimation of mixed models.
+
+ \end{document} 
