@@ -1,0 +1,117 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{verbatim}
+\usepackage[margin=1in]{geometry}
+\usepackage{listings}
+\usepackage{appendix}
+\usepackage{setspace}
+\usepackage{float}
+\usepackage{subfigure}
+\usepackage[]{caption2}
+\usepackage[colorlinks=true,linkcolor=blue,urlcolor=blue,citecolor=blue]{hyperref}
+\renewcommand{\baselinestretch}{1.5}
+\renewcommand\arraystretch{1.5}
+\geometry{left=2cm,right=2cm,top=2cm,bottom=2cm}
+\setlength{\arrayrulewidth}{0.3mm}
+
+\title{application part}
+\author{Shanshan Song & Ziwen Tang}
+\date{9 February 2019}
+
+\begin{document}
+
+\maketitle
+
+\section{Background and Data Collection}
+     \newcommand\iid{i.i.d.}
+     \newcommand\pN{\mathcal{N}}
+    Suppose we have a dataset that looks at the bounce rates of users of a website with cooking recipes. A bounce rate is a measure of how quickly someone leaves a website, e.g. the number of seconds after which a user first accesses a webpage from the website and then leaves. Most websites want individuals to stay on their websites for a long time as these individuals are more likely to read another article, buy one of their products, click on some of the sponsored links etc. As is said above, it can be useful to understand why some users leave the website quicker than others. To investigate the bounce rate of the website, eight counties were chosen in Germany, and members of the public of all ages were requested  to fill in a questionnaire. In the questionnaire we asked them to use our search engine to check something they want to eat this evening. Our website was listed in the search engine first, and other similar websites were also included. We recorded the bounce time of surfers who clicked on our website, as well as their age and county where they came from. The purpose of our study is to work out if there is a relationship between age and boounce\_time.  See \url{https://www.kaggle.com/ojwatson/mixed-models/notebook} for more details.
+\section{Methodology}
+\subsection{Data Analysis}
+\subsubsection{Analysis of age and bounce\_time}
+    \\Before we continue, we want to standardize the independent explanatory variables by scaling them. This makes sure that any estimated coefficient from our regression model later on are all on the same scale. So in our case, age would be scaled, thus we have a new variable called age\_scaled, which is the age scaled to have zero mean and unit variance. See the table 1 of how age\_scaled and bounce\_time distribute in Appendix.
+\subsubsection{Existence of grouping factor}
+In the beginning we might want to fit a linear regression with the data, as can be seen from Fig.2 in Appendix, the residuals exhibit great variety across age\_scaled. Remember that one of the key assumptions is that the observations of our data are independent of the other data. The data was collected in 8 different counties, so we should check this by comparing bounce\_times in different counties. From Fig.3 we see that there is substantial grouping factor due to counties, which shows that our data is not independent, and thus we should consider linear mixed model with county as random effect.
+\subsection{Comparing Different Models}
+From what we have discussed above, simple linear model is probably not ideal without incorporating the impact of county. To look at the impact of age on bounce times we need to control for the variation between the different counties. So to do that, we have to treat our counties as random effects and build a mixed effect model. Four models will be constructed like following:
+\\\textbf{MODEL 1}: Ordinary Least Squares:
+\begin{equation}
+    bounce\_time = \beta_0 + \beta_1age\_scaled + \epsilon
+\end{equation}
+\textbf{MODEL 2}: Random intercepts for each county as they deviate from population intercept:
+\begin{equation}
+    bounce\_time = \beta_0 + \beta_1age\_scaled + b_{c0} + \epsilon_c
+\end{equation}
+\textbf{MODEL 3}: Random slopes for each county as they deviate from population slope:
+\begin{equation}
+    bounce\_time = \beta_0 + \beta_1age\_scaled + b_{c1}age\_scaled + \epsilon_c
+\end{equation}
+\textbf{MODEL 4}: Both random intercepts and slopes for each county as they deviate from population intercept and slope:
+\begin{equation}
+    bounce\_time = \beta_0 + \beta_1age\_scaled +  b_{c0} + b_{c1}age\_scaled + \epsilon_c
+\end{equation}
+
+    
+\section{Results and Analysis}
+Before we add any random effects in the model, we use t-test and F-test to testify the fixed parameters, both the intercept and slope have a very significant level(p < 0.005), which means $\beta_0$ and $\beta_1$ affect the model greatly. F-test(F = 54.036, p < 0.0001) shows that fixed effect model significantly describes the relationship between age\_scaled and bounce\_time. So model 1 can be used as basic model in our case. The fitting result of four models above is given by the following table,
+\begin{table}[h!]
+\centering
+ \begin{tabular}{||c c c c c c c||} 
+ \hline
+ \textbf{Model} & \textbf{df} & \textbf{AIC} & \textbf{BIC} & \textbf{-2log \boldsymbol{$lik$}} & \textbf{LRT} & \textbf{P}\\ [0.5ex] 
+ \hline\hline
+ \textbf{Model 1}(fixed effect)& 3 & 3766.708 & 3779.088 & 3760.708 &          &           \\ 
+ \textbf{Model 2}(with random intercept) & 4 & 3320.431 & 3336.938 & 3312.431 &  448.277 & 1.710e-99 \\
+ \textbf{Model 3}(with random slope) & 4 & 3571.844 & 3588.351 & 3563.800 &  196.864 & 1.010e-44 \\
+ \textbf{Model 4}(with random intercept and slope) & 6 & 3321.825 & 3346.586 & 3309.800 &  450.883 & 1.236e-98\\ [1ex] 
+ \hline
+ \end{tabular}
+\end{table}
+From the table we can see that AIC, BIC and -2log $lik$ in Model 2, 3 and 4 are all smaller than those in model 1, LRT result shows that three mixed effects models are significantly different from fixed effect model(p < 0.05), which means mixed models with random effects are obviously better than fixed effect model. Comparing AIC, BIC and -2log $lik$ among three mixed models, model 2 and model 4 are better than model 3, and the random intercept model is most significantly from fixed effect model(1.710e-99 < 1.236e-98), thus we take random intercept model as the optimal model.
+
+\subsection{Conclusion and Discussion}
+1. Using the 480 observation sets we obtained in this bounce\_time example, we build linear mixed models which predict the relationship between age and bounce\_time and evaluate the fitting level using AIC, BIC and -2log$lik$. The result shows that these values are all smaller than in fixed model, which suggests the necessity of including county as random effect.
+\\2. When we only consider three mixed effects models, random intercept model fits the data best. Age has a strong relationship with bounce\_time, Individuals from different counties have significantly different bounce\_time but individuals from the same county share the same effect brough by the county.
+ 
+ \section{Appendix}
+ \renewcommand{\figurename}{Fig.} 
+\renewcommand{\captionlabeldelim}{.~} 
+\renewcommand{\thesubfigure}{(\roman{subfigure})}
+\makeatletter \renewcommand{\@thesubfigure}{\thesubfigure \space}
+\renewcommand{\p@subfigure}{} \makeatother
+\begin{figure}[H]
+\centering  
+\subfigure[]{
+\label{Fig.sub.1}
+\includegraphics[width=0.45\textwidth]{3.PNG}}
+\subfigure[]{
+\label{Fig.sub.2}
+\includegraphics[width=0.45\textwidth]{4.PNG}}
+\caption{Dataset overview}
+\label{Fig.main}
+\end{figure}
+
+\begin{figure}[H]
+\centering  
+\subfigure[]{
+\label{Fig.sub.1}
+\includegraphics[width=0.45\textwidth]{5.PNG}}
+\subfigure[]{
+\label{Fig.sub.2}
+\includegraphics[width=0.45\textwidth]{6.PNG}}
+\caption{Regression with OLS}
+\label{Fig.main}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[scale=0.6]{7.PNG}
+\caption{Bounce\_time in different counties}
+\label{fig:label}
+\end{figure}
+
+ \end{document}
+ 
